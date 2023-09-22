@@ -44,7 +44,7 @@ fn recieve(
     mut server_unbound_events: EventReader<net::ServerUnboundEvent>,
     mut recieved_packet_from_server_events: EventReader<net::RecievedPacketFromServerEvent>
 ) {
-    for server_unbound_event in server_unbound_events.iter() {
+    for _ in server_unbound_events.iter() {
         println!("Server unbound.");
     }
 

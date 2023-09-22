@@ -62,7 +62,7 @@ fn connect_event_system(
             let tcp_stream = TcpStream::connect("127.0.0.1:2560").unwrap();
             tcp_stream.set_nonblocking(true).unwrap();
             commands.spawn((
-                TcpStreamComponent(tcp_stream),
+                TcpStreamComponent::new(tcp_stream),
                 Name::new("TcpStream")
             ));
         }
@@ -76,7 +76,7 @@ fn disconnect_event_system(
 ) {
     for _ in disconnect_events.iter() {
         if let Ok((tcp_stream_entity, tcp_stream_component)) = tcp_stream_entity_and_tcp_stream_component_query.get_single() {
-            tcp_stream_component.0.shutdown(Shutdown::Both).unwrap();
+            tcp_stream_component.tcp_stream.shutdown(Shutdown::Both).unwrap();
             commands.entity(tcp_stream_entity).despawn();
         }
     }
@@ -88,7 +88,7 @@ fn send_packet_to_server_event_system(
 ) {
     for _ in send_packet_to_server_events.iter() {
         if let Ok(mut tcp_stream_component) = tcp_stream_component_query.get_single_mut() {
-            tcp_stream_component.0.write(
+            tcp_stream_component.tcp_stream.write(
                 &bincode::serialize(&Packet::MyPacket("Client -> Server".to_string())).unwrap()
             ).unwrap();
         }
@@ -103,11 +103,11 @@ fn listen_for_server_packets_system(
 ) {
     if let Ok((tcp_stream_entity, mut tcp_stream_component)) = tcp_stream_entity_and_tcp_stream_component_query.get_single_mut() {
         let mut buffer = [0; 1024];
-        match tcp_stream_component.0.read(&mut buffer) {
+        match tcp_stream_component.tcp_stream.read(&mut buffer) {
             Ok(0) => {
                 // send server (and client?) data with event
                 server_unbound_event.send(ServerUnboundEvent);
-                tcp_stream_component.0.shutdown(Shutdown::Both).unwrap();
+                tcp_stream_component.tcp_stream.shutdown(Shutdown::Both).unwrap();
                 commands.entity(tcp_stream_entity);
             },
             Ok(packet_length) => {

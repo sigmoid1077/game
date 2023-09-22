@@ -72,7 +72,7 @@ fn bind_event_system(
             let tcp_listener = TcpListener::bind("127.0.0.1:2560").unwrap();
             tcp_listener.set_nonblocking(true).unwrap();
             commands.spawn((
-                TcpListenerComponent(tcp_listener),
+                TcpListenerComponent::new(tcp_listener),
                 Name::new("TcpListener")
             ));
         }
@@ -87,7 +87,7 @@ fn unbind_event_system(
 ) {
     for _ in unbind_events.iter() {
         for (tcp_stream_entity, tcp_stream_component) in tcp_stream_entity_and_tcp_stream_component_query.iter() {
-            tcp_stream_component.0.shutdown(Shutdown::Both).unwrap();
+            tcp_stream_component.tcp_stream.shutdown(Shutdown::Both).unwrap();
             commands.entity(tcp_stream_entity).despawn();
         }
 
@@ -115,7 +115,7 @@ fn send_packet_to_all_clients_event_system(
 ) {
     for _ in send_packet_to_all_clients_event.iter() {
         for mut tcp_stream_component in tcp_stream_component_query.iter_mut() {
-            tcp_stream_component.0.write(
+            tcp_stream_component.tcp_stream.write(
                 &bincode::serialize(&Packet::MyPacket("Server -> Client".to_string())).unwrap()
             ).unwrap();
         }
@@ -128,10 +128,10 @@ fn listen_for_client_connections_system(
     tcp_listener_component_query: Query<&TcpListenerComponent>
 ) {
     if let Ok(tcp_listener_component) = tcp_listener_component_query.get_single() {
-        if let Ok((tcp_stream, _)) = tcp_listener_component.0.accept() {
+        if let Ok((tcp_stream, _)) = tcp_listener_component.tcp_listener.accept() {
             tcp_stream.set_nonblocking(true).unwrap();
             commands.spawn((
-                TcpStreamComponent(tcp_stream),
+                TcpStreamComponent::new(tcp_stream),
                 Name::new("TcpStream")
             ));
             client_connect_events.send(ClientConnectedEvent);
@@ -149,11 +149,11 @@ fn listen_for_client_packets_system(
     for (tcp_steam_entity, mut tcp_stream_component) in tcp_stream_entity_and_tcp_stream_component_query.iter_mut() {
         let mut buffer = [0; 1024];
 
-        match tcp_stream_component.0.read(&mut buffer) {
+        match tcp_stream_component.tcp_stream.read(&mut buffer) {
             Ok(0) => {
                 // send client data with event
                 client_disconnect_event.send(ClientDisconnectedEvent);
-                tcp_stream_component.0.shutdown(Shutdown::Both).unwrap();
+                tcp_stream_component.tcp_stream.shutdown(Shutdown::Both).unwrap();
                 commands.entity(tcp_steam_entity).despawn();
             },
             Ok(packet_length) => {

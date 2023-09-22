@@ -26,10 +26,26 @@ pub use server::{
 };
 
 #[derive(Component)]
-struct TcpListenerComponent(TcpListener);
+struct TcpListenerComponent {
+    pub tcp_listener: TcpListener
+}
+
+impl TcpListenerComponent {
+    fn new(tcp_listener: TcpListener) -> Self {
+        Self { tcp_listener }
+    }
+}
 
 #[derive(Component)]
-struct TcpStreamComponent(TcpStream);
+struct TcpStreamComponent {
+    pub tcp_stream: TcpStream
+}
+
+impl TcpStreamComponent {
+    fn new(tcp_stream: TcpStream) -> Self {
+        Self { tcp_stream }
+    }
+}
 
 #[derive(Serialize, Deserialize)]
 pub enum Packet {
