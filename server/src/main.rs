@@ -16,8 +16,16 @@ struct TestPlugin;
 
 impl Plugin for TestPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Update, (send, recieve));
+        app
+            .add_systems(Startup, startup)
+            .add_systems(Update, (send, recieve));
     }
+}
+
+fn startup(
+    mut bind_event: EventWriter<net::BindEvent>,
+) {
+    bind_event.send(net::BindEvent::new(7777));
 }
 
 fn send(

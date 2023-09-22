@@ -61,10 +61,7 @@ fn connect_event_system(
         if let Err(QuerySingleError::NoEntities(_)) = tcp_stream_component_query.get_single() {
             let tcp_stream = TcpStream::connect("127.0.0.1:2560").unwrap();
             tcp_stream.set_nonblocking(true).unwrap();
-            commands.spawn((
-                TcpStreamComponent::new(tcp_stream),
-                Name::new("TcpStream")
-            ));
+            commands.spawn((TcpStreamComponent::new(tcp_stream), Name::new("TcpStream")));
         }
     }
 }
@@ -88,9 +85,7 @@ fn send_packet_to_server_event_system(
 ) {
     for _ in send_packet_to_server_events.iter() {
         if let Ok(mut tcp_stream_component) = tcp_stream_component_query.get_single_mut() {
-            tcp_stream_component.tcp_stream.write(
-                &bincode::serialize(&Packet::MyPacket("Client -> Server".to_string())).unwrap()
-            ).unwrap();
+            tcp_stream_component.tcp_stream.write(&bincode::serialize(&Packet::MyPacket("Client -> Server".to_string())).unwrap()).unwrap();
         }
     }
 }
@@ -110,13 +105,7 @@ fn listen_for_server_packets_system(
                 tcp_stream_component.tcp_stream.shutdown(Shutdown::Both).unwrap();
                 commands.entity(tcp_stream_entity);
             },
-            Ok(packet_length) => {
-                received_packet_from_server_event.send(
-                    RecievedPacketFromServerEvent::new(
-                        bincode::deserialize(&buffer[0..packet_length]).unwrap()
-                    )
-                );
-            },
+            Ok(packet_length) => received_packet_from_server_event.send(RecievedPacketFromServerEvent::new(bincode::deserialize(&buffer[0..packet_length]).unwrap())),
             Err(_) => ()
         }
     }

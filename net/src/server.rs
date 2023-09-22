@@ -115,9 +115,7 @@ fn send_packet_to_all_clients_event_system(
 ) {
     for _ in send_packet_to_all_clients_event.iter() {
         for mut tcp_stream_component in tcp_stream_component_query.iter_mut() {
-            tcp_stream_component.tcp_stream.write(
-                &bincode::serialize(&Packet::MyPacket("Server -> Client".to_string())).unwrap()
-            ).unwrap();
+            tcp_stream_component.tcp_stream.write(&bincode::serialize(&Packet::MyPacket("Server -> Client".to_string())).unwrap()).unwrap();
         }
     }
 }
@@ -130,16 +128,12 @@ fn listen_for_client_connections_system(
     if let Ok(tcp_listener_component) = tcp_listener_component_query.get_single() {
         if let Ok((tcp_stream, _)) = tcp_listener_component.tcp_listener.accept() {
             tcp_stream.set_nonblocking(true).unwrap();
-            commands.spawn((
-                TcpStreamComponent::new(tcp_stream),
-                Name::new("TcpStream")
-            ));
+            commands.spawn((TcpStreamComponent::new(tcp_stream), Name::new("TcpStream")));
             client_connect_events.send(ClientConnectedEvent);
         }
     }
 }
 
-// Add support for multiple different packet types (different enum variants)
 fn listen_for_client_packets_system(
     mut commands: Commands,
     mut client_disconnect_event: EventWriter<ClientDisconnectedEvent>,
@@ -156,13 +150,7 @@ fn listen_for_client_packets_system(
                 tcp_stream_component.tcp_stream.shutdown(Shutdown::Both).unwrap();
                 commands.entity(tcp_steam_entity).despawn();
             },
-            Ok(packet_length) => {
-                recieved_packet_from_client_event.send(
-                    RecievedPacketFromClientEvent::new(
-                        bincode::deserialize(&buffer[0..packet_length]).unwrap()
-                    )
-                );
-            },
+            Ok(packet_length) => recieved_packet_from_client_event.send(RecievedPacketFromClientEvent::new(bincode::deserialize(&buffer[0..packet_length]).unwrap())),
             Err(_) => ()
         }
     }
