@@ -1,6 +1,18 @@
 use crate::{TcpListenerComponent, TcpStreamComponent, Packet};
-use std::{net::{TcpListener, Shutdown}, io::{Read, Write}};
-use bevy::prelude::*;
+use std::{
+    net::{TcpListener, Shutdown}, 
+    io::{Read, Write}
+};
+use bevy::{
+    app::{App, Plugin, Update}, 
+    core::Name,
+    ecs::{
+        entity::Entity,
+        event::{Event, EventReader, EventWriter},
+        query::With,
+        system::{Commands, Query}
+    }
+};
 
 pub struct ServerPlugin;
 
@@ -49,7 +61,15 @@ pub struct ClientDisconnectedEvent;
 pub struct SendPacketToClientEvent;
 
 #[derive(Event)]
-pub struct SendPacketToAllClientsEvent;
+pub struct SendPacketToAllClientsEvent {
+    pub packet: Packet
+}
+
+impl SendPacketToAllClientsEvent {
+    pub fn new(packet: Packet) -> Self {
+        Self { packet }
+    }
+}
 
 #[derive(Event)]
 pub struct RecievedPacketFromClientEvent {
@@ -110,12 +130,12 @@ fn send_packet_to_client_event_system(
 }
 
 fn send_packet_to_all_clients_event_system(
-    mut send_packet_to_all_clients_event: EventReader<SendPacketToAllClientsEvent>,
+    mut send_packet_to_all_clients_events: EventReader<SendPacketToAllClientsEvent>,
     mut tcp_stream_component_query: Query<&mut TcpStreamComponent>
 ) {
-    for _ in send_packet_to_all_clients_event.iter() {
+    for send_packet_to_all_clients_event in send_packet_to_all_clients_events.iter() {
         for mut tcp_stream_component in tcp_stream_component_query.iter_mut() {
-            tcp_stream_component.tcp_stream.write(&bincode::serialize(&Packet::MyPacket("Server -> Client".to_string())).unwrap()).unwrap();
+            tcp_stream_component.tcp_stream.write(&bincode::serialize(&send_packet_to_all_clients_event.packet).unwrap()).unwrap();
         }
     }
 }

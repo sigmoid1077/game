@@ -1,6 +1,18 @@
 use crate::{TcpStreamComponent, Packet};
-use std::{net::{Shutdown, TcpStream, SocketAddr}, io::{Read, Write}};
-use bevy::{prelude::*, ecs::query::QuerySingleError};
+use std::{
+    net::{Shutdown, TcpStream, SocketAddr}, 
+    io::{Read, Write}
+};
+use bevy::{
+    app::{App, Plugin, Update}, 
+    core::Name,
+    ecs::{
+        entity::Entity,
+        event::{Event, EventReader, EventWriter},
+        query::QuerySingleError,
+        system::{Commands, Query}
+    }
+};
 
 pub struct ClientPlugin;
 
@@ -39,7 +51,15 @@ pub struct DisconnectEvent;
 pub struct ServerUnboundEvent;
 
 #[derive(Event)]
-pub struct SendPacketToServerEvent;
+pub struct SendPacketToServerEvent {
+    pub packet: Packet
+}
+
+impl SendPacketToServerEvent {
+    pub fn new(packet: Packet) -> Self {
+        Self { packet }
+    }
+}
 
 #[derive(Event)]
 pub struct RecievedPacketFromServerEvent {
@@ -83,9 +103,9 @@ fn send_packet_to_server_event_system(
     mut send_packet_to_server_events: EventReader<SendPacketToServerEvent>,
     mut tcp_stream_component_query: Query<&mut TcpStreamComponent>
 ) {
-    for _ in send_packet_to_server_events.iter() {
+    for send_packet_to_server_event in send_packet_to_server_events.iter() {
         if let Ok(mut tcp_stream_component) = tcp_stream_component_query.get_single_mut() {
-            tcp_stream_component.tcp_stream.write(&bincode::serialize(&Packet::MyPacket("Client -> Server".to_string())).unwrap()).unwrap();
+            tcp_stream_component.tcp_stream.write(&bincode::serialize(&send_packet_to_server_event.packet).unwrap()).unwrap();
         }
     }
 }

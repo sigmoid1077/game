@@ -1,4 +1,9 @@
-use bevy::prelude::*;
+use bevy::{
+    app::{App, AppExit, Plugin, Update, Startup},
+    DefaultPlugins,
+    ecs::event::{EventReader, EventWriter},
+    input::{keyboard::KeyboardInput, ButtonState}
+};
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
 
 fn main() {
@@ -18,7 +23,7 @@ impl Plugin for TestPlugin {
     fn build(&self, app: &mut App) {
         app
             .add_systems(Startup, startup)
-            .add_systems(Update, (send, recieve));
+            .add_systems(Update, update);
     }
 }
 
@@ -28,41 +33,26 @@ fn startup(
     bind_event.send(net::BindEvent::new(7777));
 }
 
-fn send(
-    input_keycode: Res<Input<KeyCode>>,
-    mut bind_event: EventWriter<net::BindEvent>,
+fn update(
+    mut app_exit_events: EventReader<AppExit>,
+    mut keyboard_input_events: EventReader<KeyboardInput>,
     mut unbind_event: EventWriter<net::UnbindEvent>,
+    mut recieved_packet_from_client_events: EventReader<net::RecievedPacketFromClientEvent>,
     mut send_packet_to_all_clients_event: EventWriter<net::SendPacketToAllClientsEvent>
 ) {
-    if input_keycode.just_pressed(KeyCode::Q) {
-        bind_event.send(net::BindEvent::new(7777));
-    }
-
-    if input_keycode.just_pressed(KeyCode::W) {
+    for _ in app_exit_events.iter() {
         unbind_event.send(net::UnbindEvent);
-    }
-
-    if input_keycode.just_pressed(KeyCode::E) {
-        send_packet_to_all_clients_event.send(net::SendPacketToAllClientsEvent);
-    }
-}
-
-fn recieve(
-    mut client_connected_events: EventReader<net::ClientConnectedEvent>,
-    mut client_disconnected_events: EventReader<net::ClientDisconnectedEvent>,
-    mut recieved_packet_from_client_events: EventReader<net::RecievedPacketFromClientEvent>
-) {
-    for _ in client_connected_events.iter() {
-        println!("Client connected.")
-    }
-
-    for _ in client_disconnected_events.iter() {
-        println!("Client disconnected.")
     }
 
     for recieved_packet_from_client_event in recieved_packet_from_client_events.iter() {
         match &recieved_packet_from_client_event.packet {
             net::Packet::MyPacket(string) => println!("{}", &string)
+        }
+    }
+
+    for keyboard_input_event in keyboard_input_events.iter() {
+        if keyboard_input_event.state == ButtonState::Pressed {
+            send_packet_to_all_clients_event.send(net::SendPacketToAllClientsEvent::new(net::Packet::MyPacket(format!("{:?}", keyboard_input_event.key_code.unwrap()))));
         }
     }
 }

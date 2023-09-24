@@ -1,6 +1,6 @@
 use std::net::{TcpListener, TcpStream};
 use serde::{Serialize, Deserialize};
-use bevy::prelude::*;
+use bevy::ecs::component::Component;
 
 pub mod client;
 pub mod server;
