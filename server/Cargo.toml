@@ -6,4 +6,4 @@ edition = "2021"
 [dependencies]
 bevy = { workspace = true }
 bevy-inspector-egui = { workspace = true }
-net = { workspace = true }
+util = { workspace = true }
