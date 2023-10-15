@@ -3,12 +3,10 @@ name = "util"
 version = "0.1.0"
 edition = "2021"
 
-[lib]
-proc-macro = true
-
 [dependencies]
-syn = { workspace = true }
-quote = { workspace = true }
 bevy = { workspace = true }
-serde = { workspace = true } 
 bincode = { workspace = true }
+proc-macros = { workspace = true }
+quote = { workspace = true }
+serde = { workspace = true }
+syn = { workspace = true }

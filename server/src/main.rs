@@ -1,18 +1,19 @@
 use bevy::{
-    app::{App, AppExit, Plugin, Update, Startup},
-    DefaultPlugins,
+    app::{App, AppExit, Plugin, Startup, Update},
     ecs::event::{EventReader, EventWriter},
-    input::{keyboard::KeyboardInput, ButtonState}
+    input::{keyboard::KeyboardInput, ButtonState},
+    DefaultPlugins,
 };
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
+use util::net;
 
 fn main() {
     App::new()
         .add_plugins((
-            DefaultPlugins, 
+            DefaultPlugins,
             net::ServerPlugin,
             TestPlugin,
-            WorldInspectorPlugin::new()
+            WorldInspectorPlugin::new(),
         ))
         .run();
 }
@@ -21,15 +22,12 @@ struct TestPlugin;
 
 impl Plugin for TestPlugin {
     fn build(&self, app: &mut App) {
-        app
-            .add_systems(Startup, startup)
+        app.add_systems(Startup, startup)
             .add_systems(Update, update);
     }
 }
 
-fn startup(
-    mut bind_event: EventWriter<net::BindEvent>,
-) {
+fn startup(mut bind_event: EventWriter<net::BindEvent>) {
     bind_event.send(net::BindEvent::new(7777));
 }
 
@@ -38,7 +36,7 @@ fn update(
     mut keyboard_input_events: EventReader<KeyboardInput>,
     mut unbind_event: EventWriter<net::UnbindEvent>,
     mut recieved_packet_from_client_events: EventReader<net::RecievedPacketFromClientEvent>,
-    mut send_packet_to_all_clients_event: EventWriter<net::SendPacketToAllClientsEvent>
+    mut send_packet_to_all_clients_event: EventWriter<net::SendPacketToAllClientsEvent>,
 ) {
     for _ in app_exit_events.iter() {
         unbind_event.send(net::UnbindEvent);
@@ -46,13 +44,15 @@ fn update(
 
     for recieved_packet_from_client_event in recieved_packet_from_client_events.iter() {
         match &recieved_packet_from_client_event.packet {
-            net::Packet::MyPacket(string) => println!("{}", &string)
+            net::Packet::MyPacket(string) => println!("{}", &string),
         }
     }
 
     for keyboard_input_event in keyboard_input_events.iter() {
         if keyboard_input_event.state == ButtonState::Pressed {
-            send_packet_to_all_clients_event.send(net::SendPacketToAllClientsEvent::new(net::Packet::MyPacket(format!("{:?}", keyboard_input_event.key_code.unwrap()))));
+            send_packet_to_all_clients_event.send(net::SendPacketToAllClientsEvent::new(
+                net::Packet::MyPacket(format!("{:?}", keyboard_input_event.key_code.unwrap())),
+            ));
         }
     }
 }

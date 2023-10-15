@@ -1,13 +1,14 @@
 [workspace]
-members = ["client", "server", "util"]
+members = ["client", "proc-macros", "server", "util"]
 
 [workspace.dependencies]
 bevy = "0.11.3"
 bevy-inspector-egui = "0.20.0"
-serde = "1.0.188"
 bincode = "1.3.3"
-syn = "2.0.38"
+proc-macros = { path = "./proc-macros" }
 quote = "1.0.33"
+serde = "1.0.189"
+syn = "2.0.38"
 util = { path = "./util" }
 
 [profile.dev]

@@ -1,33 +1,23 @@
-use std::net::{TcpListener, TcpStream};
-use serde::{Serialize, Deserialize};
 use bevy::ecs::component::Component;
+use serde::{Deserialize, Serialize};
+use std::net::{TcpListener, TcpStream};
 
 pub mod client;
 pub mod server;
 
 pub use client::{
-    ClientPlugin,
-    ConnectEvent,
-    ServerUnboundEvent,
-    DisconnectEvent,
-    SendPacketToServerEvent,
-    RecievedPacketFromServerEvent,
+    ClientPlugin, ConnectEvent, DisconnectEvent, RecievedPacketFromServerEvent,
+    SendPacketToServerEvent, ServerUnboundEvent,
 };
 
 pub use server::{
-    ServerPlugin,
-    BindEvent,
-    UnbindEvent,
-    ClientConnectedEvent,
-    ClientDisconnectedEvent,
-    SendPacketToClientEvent,
-    SendPacketToAllClientsEvent,
-    RecievedPacketFromClientEvent
+    BindEvent, ClientConnectedEvent, ClientDisconnectedEvent, RecievedPacketFromClientEvent,
+    SendPacketToAllClientsEvent, SendPacketToClientEvent, ServerPlugin, UnbindEvent,
 };
 
 #[derive(Component)]
 struct TcpListenerComponent {
-    pub tcp_listener: TcpListener
+    pub tcp_listener: TcpListener,
 }
 
 impl TcpListenerComponent {
@@ -38,7 +28,7 @@ impl TcpListenerComponent {
 
 #[derive(Component)]
 struct TcpStreamComponent {
-    pub tcp_stream: TcpStream
+    pub tcp_stream: TcpStream,
 }
 
 impl TcpStreamComponent {
@@ -49,5 +39,5 @@ impl TcpStreamComponent {
 
 #[derive(Serialize, Deserialize)]
 pub enum Packet {
-    MyPacket(String)
+    MyPacket(String),
 }
