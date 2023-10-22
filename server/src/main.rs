@@ -29,7 +29,7 @@ impl Plugin for TestPlugin {
 }
 
 fn startup(mut bind_event: EventWriter<net::server::event::write::BindEvent>) {
-    bind_event.send(net::server::event::write::BindEvent(2560));
+    bind_event.send(net::server::event::write::BindEvent(std::env::args().collect::<Vec<_>>().last().unwrap().parse().unwrap()));
 }
 
 fn update(

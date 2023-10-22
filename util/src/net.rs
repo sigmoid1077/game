@@ -139,9 +139,7 @@ pub mod client {
                         tcp_stream_component.0.shutdown(Shutdown::Both).unwrap();
                         commands.entity(entity_with_tcp_stream_component).despawn();
                     },
-                    Ok(packet_length) => {
-                        recieved_packet_events.send(event::read::RecievedPacket(bincode::deserialize(&buffer[0..packet_length]).unwrap()))
-                    },
+                    Ok(packet_length) => recieved_packet_events.send(event::read::RecievedPacket(bincode::deserialize(&buffer[0..packet_length]).unwrap())),
                     _ => ()
                 }
             }
@@ -162,7 +160,7 @@ pub mod server {
     use crate::net::{BUFFER_SIZE, TcpListenerComponent, TcpStreamComponent};
     use std::{
         io::{Read, Write}, 
-        net::{TcpListener, Shutdown}
+        net::{TcpListener, Shutdown, SocketAddr}
     };
     
     pub struct ServerPlugin;
@@ -224,11 +222,11 @@ pub mod server {
     fn read_bind_event_system(
         mut bind_events: EventReader<event::write::BindEvent>,
         mut commands: Commands,
-        tcp_component_query: Query<&TcpListenerComponent>
+        tcp_listener_component_query: Query<&TcpListenerComponent>
     ) {
-        for _bind_event in bind_events.iter() {
-            if tcp_component_query.is_empty() {
-                let tcp_listener = TcpListener::bind("127.0.0.1:2560").unwrap();
+        for bind_event in bind_events.iter() {
+            if tcp_listener_component_query.is_empty() {
+                let tcp_listener = TcpListener::bind(SocketAddr::from(([127, 0, 0, 1], bind_event.0))).unwrap();
                 tcp_listener.set_nonblocking(true).unwrap();
                 commands.spawn(TcpListenerComponent(tcp_listener));
             }
@@ -313,9 +311,7 @@ pub mod server {
                         tcp_stream_component.0.shutdown(Shutdown::Both).unwrap();
                         commands.entity(entity_with_tcp_stream_component).despawn();
                     },
-                    Ok(packet_length) => {
-                        recieved_packet_from_client_event.send(event::read::RecievedPacketFromClientEvent(bincode::deserialize(&buffer[0..packet_length]).unwrap()))
-                    },
+                    Ok(packet_length) => recieved_packet_from_client_event.send(event::read::RecievedPacketFromClientEvent(bincode::deserialize(&buffer[0..packet_length]).unwrap())),
                     _ => ()
                 }
             }
