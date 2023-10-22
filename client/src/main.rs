@@ -4,7 +4,7 @@ use bevy::{
     input::{keyboard::KeyboardInput, ButtonState},
     DefaultPlugins
 };
-use bevy_inspector_egui::quick::WorldInspectorPlugin;
+// use bevy_inspector_egui::quick::WorldInspectorPlugin;
 use std::net::{IpAddr, Ipv4Addr, SocketAddr};
 use util::net;
 
@@ -14,7 +14,7 @@ fn main() {
             net::client::ClientPlugin,
             DefaultPlugins,
             TestPlugin,
-            WorldInspectorPlugin::new()
+            // WorldInspectorPlugin::new()
         ))
         .run();
 }
@@ -30,10 +30,8 @@ impl Plugin for TestPlugin {
 }
 
 fn startup(mut connect_event: EventWriter<net::client::event::write::ConnectEvent>) {
-    connect_event.send(net::client::event::write::ConnectEvent(SocketAddr::new(
-        IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1)),
-        7777
-    )));
+    connect_event.send(net::client::event::write::ConnectEvent(SocketAddr::new(IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1)), 2560)));
+    // connect_event.send(net::client::event::write::ConnectEvent(SocketAddr::new(IpAddr::V4(Ipv4Addr::new(69, 215, 230, 238)), 2560)));
 }
 
 fn update(

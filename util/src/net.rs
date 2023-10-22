@@ -84,9 +84,9 @@ pub mod client {
         mut connect_events: EventReader<event::write::ConnectEvent>,
         tcp_stream_component_query: Query<&TcpStreamComponent>
     ) {
-        for _connect_event in connect_events.iter() {
+        for connect_event in connect_events.iter() {
             if tcp_stream_component_query.iter().count() == 0 {
-                let tcp_stream = TcpStream::connect("127.0.0.1:2560").unwrap();
+                let tcp_stream = TcpStream::connect(connect_event.0).unwrap();
                 tcp_stream.set_nonblocking(true).unwrap();
                 commands.spawn(TcpStreamComponent(tcp_stream));
             }
@@ -175,7 +175,7 @@ pub mod server {
                 .add_event::<event::write::SendPacketToClient>()
                 .add_event::<event::write::SendPacketToAllClients>()
                 .add_event::<event::read::ClientConnectedEvent>()
-                .add_event::<event::read::ClientConnectedEvent>()
+                .add_event::<event::read::ClientDisconnectedEvent>()
                 .add_event::<event::read::RecievedPacketFromClientEvent>()
                 .add_systems(Update, (
                     read_bind_event_system,
