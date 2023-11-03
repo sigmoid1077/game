@@ -5,13 +5,19 @@ use bevy::{
     DefaultPlugins
 };
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
+use serde::{Serialize, Deserialize};
 use std::net::ToSocketAddrs;
 use util::net;
+
+#[derive(Serialize, Deserialize)]
+enum Packet {
+    MyPacket(String),
+}
 
 fn main() {
     App::new()
         .add_plugins((
-            net::client::ClientPlugin,
+            net::ClientPlugin::<Packet>,
             DefaultPlugins,
             TestPlugin,
             WorldInspectorPlugin::new()
@@ -30,7 +36,7 @@ impl Plugin for TestPlugin {
 }
 
 fn startup(mut connect_event: EventWriter<net::client::event::write::ConnectEvent>) {
-    connect_event.send(net::client::event::write::ConnectEvent(*std::env::args().collect::<Vec<_>>().last().unwrap().to_socket_addrs().unwrap().collect::<Vec<_>>().first().unwrap()));
+    connect_event.send(net::client::event::write::ConnectEvent(std::env::args().collect::<Vec<_>>().last().unwrap().to_socket_addrs().unwrap().collect::<Vec<_>>().first().unwrap().to_owned()));
 }
 
 fn update(

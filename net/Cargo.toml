@@ -1,0 +1,10 @@
+[package]
+name = "net"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+bevy = { workspace = true }
+bincode = { workspace = true }
+serde = { workspace = true }
+websocket = { workspace = true }
