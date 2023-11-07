@@ -8,7 +8,7 @@ use bevy::{
 };
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
 use serde::{Deserialize, Serialize};
-use util::net;
+use util::{net, net::server::event};
 
 #[derive(Serialize, Deserialize)]
 enum Packet {
@@ -48,19 +48,19 @@ impl Plugin for TestPlugin {
     }
 }
 
-fn startup(mut bind_event: EventWriter<net::server::event::write::BindEvent>) {
-    bind_event.send(net::server::event::write::BindEvent(std::env::args().collect::<Vec<_>>().last().unwrap().parse().unwrap()));
+fn startup(mut bind_event: EventWriter<event::write::BindEvent>) {
+    bind_event.send(event::write::BindEvent(std::env::args().collect::<Vec<_>>().last().unwrap().parse().unwrap()));
 }
 
 fn update(
     mut app_exit_events: EventReader<AppExit>,
     mut keyboard_input_events: EventReader<KeyboardInput>,
-    mut unbind_event: EventWriter<net::server::event::write::UnbindEvent>,
-    mut recieved_packet_from_client_events: EventReader<net::server::event::read::RecievedPacketFromClientEvent<Packet>>,
-    mut send_packet_to_all_clients_event: EventWriter<net::server::event::write::SendPacketToAllClients<Packet>>
+    mut unbind_event: EventWriter<event::write::UnbindEvent>,
+    mut recieved_packet_from_client_events: EventReader<event::read::RecievedPacketFromClientEvent<Packet>>,
+    mut send_packet_to_all_clients_event: EventWriter<event::write::SendPacketToAllClients<Packet>>
 ) {
-    for _ in app_exit_events.read() {
-        unbind_event.send(net::server::event::write::UnbindEvent);
+    for _app_exit_event in app_exit_events.read() {
+        unbind_event.send(event::write::UnbindEvent);
     }
 
     for recieved_packet_from_client_event in recieved_packet_from_client_events.read() {
@@ -71,7 +71,7 @@ fn update(
 
     for keyboard_input_event in keyboard_input_events.read() {
         if keyboard_input_event.state == ButtonState::Pressed {
-            send_packet_to_all_clients_event.send(net::server::event::write::SendPacketToAllClients(Packet::MyPacket(format!("{:?}", keyboard_input_event.key_code.unwrap()))));
+            send_packet_to_all_clients_event.send(event::write::SendPacketToAllClients(Packet::MyPacket(format!("{:?}", keyboard_input_event.key_code.unwrap()))));
         }
     }
 }

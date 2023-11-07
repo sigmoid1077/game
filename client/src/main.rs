@@ -7,7 +7,7 @@ use bevy::{
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
 use serde::{Serialize, Deserialize};
 use std::{net::ToSocketAddrs, marker::PhantomData};
-use util::net;
+use util::{net, net::client::event};
 
 #[derive(Serialize, Deserialize)]
 enum Packet {
@@ -47,19 +47,19 @@ impl Plugin for TestPlugin {
     }
 }
 
-fn startup(mut connect_event: EventWriter<net::client::event::write::ConnectEvent>) {
-    connect_event.send(net::client::event::write::ConnectEvent(std::env::args().collect::<Vec<_>>().last().unwrap().to_socket_addrs().unwrap().collect::<Vec<_>>().first().unwrap().to_owned()));
+fn startup(mut connect_event: EventWriter<event::write::ConnectEvent>) {
+    connect_event.send(event::write::ConnectEvent(std::env::args().collect::<Vec<_>>().last().unwrap().to_socket_addrs().unwrap().collect::<Vec<_>>().first().unwrap().to_owned()));
 }
 
 fn update(
     mut app_exit_events: EventReader<AppExit>,
     mut keyboard_input_events: EventReader<KeyboardInput>,
-    mut disconnect_event: EventWriter<net::client::event::write::DisconnectEvent>,
-    mut recieved_packet_events: EventReader<net::client::event::read::RecievedPacket<Packet>>,
-    mut send_packet_event: EventWriter<net::client::event::write::SendPacketEvent<Packet>>
+    mut disconnect_event: EventWriter<event::write::DisconnectEvent>,
+    mut recieved_packet_events: EventReader<event::read::RecievedPacket<Packet>>,
+    mut send_packet_event: EventWriter<event::write::SendPacketEvent<Packet>>
 ) {
-    for _ in app_exit_events.read() {
-        disconnect_event.send(net::client::event::write::DisconnectEvent);
+    for _app_exit_event in app_exit_events.read() {
+        disconnect_event.send(event::write::DisconnectEvent);
     }
 
     for recieved_packet_from_server_event in recieved_packet_events.read() {
@@ -70,7 +70,7 @@ fn update(
 
     for keyboard_input_event in keyboard_input_events.read() {
         if keyboard_input_event.state == ButtonState::Pressed {
-            send_packet_event.send(net::client::event::write::SendPacketEvent(Packet::MyPacket(format!("{:?}", keyboard_input_event.key_code.unwrap()))));
+            send_packet_event.send(event::write::SendPacketEvent(Packet::MyPacket(format!("{:?}", keyboard_input_event.key_code.unwrap()))));
         }
     }
 }
