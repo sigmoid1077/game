@@ -1,7 +1,7 @@
 // add support for generic packet types
 
 use bevy::ecs::event::Event;
-use super::Packet;
+use crate::{RecievingPacket, SendingPacket};
 
 pub mod write {
     use super::*;
@@ -13,10 +13,10 @@ pub mod write {
     pub struct UnbindEvent;
 
     #[derive(Event)]
-    pub struct SendPacketToClient<P: Packet>(/* client */ pub P);
+    pub struct SendPacketToClient<Sp: SendingPacket>(/* client */ pub Sp);
 
     #[derive(Event)]
-    pub struct SendPacketToAllClients<P: Packet>(pub P);
+    pub struct SendPacketToAllClients<Sp: SendingPacket>(pub Sp);
 }
 
 pub mod read {
@@ -29,5 +29,5 @@ pub mod read {
     pub struct ClientDisconnectedEvent(/* client */);
 
     #[derive(Event)]
-    pub struct RecievedPacketFromClientEvent<P: Packet>(/* client */ pub P);
+    pub struct RecievedPacketFromClientEvent<Rp: RecievingPacket>(/* client */ pub Rp);
 }

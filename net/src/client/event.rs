@@ -1,7 +1,7 @@
 // add support for generic packet types
 
 use bevy::ecs::event::Event;
-use super::Packet;
+use crate::SendingPacket;
 use std::net::SocketAddr;
 
 pub mod write {
@@ -15,15 +15,17 @@ pub mod write {
     pub struct DisconnectEvent;
 
     #[derive(Event)]
-    pub struct SendPacketEvent<P: Packet>(pub P);
+    pub struct SendPacketEvent<Sp: SendingPacket>(pub Sp);
 }
 
 pub mod read {
+    use crate::RecievingPacket;
+
     use super::*;
 
     #[derive(Event)]
     pub struct ServerDisconnectedEvent;
 
     #[derive(Event)]
-    pub struct RecievedPacket<P: Packet>(pub P);
+    pub struct RecievedPacket<Rp: RecievingPacket>(pub Rp);
 }

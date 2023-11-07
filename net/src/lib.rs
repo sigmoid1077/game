@@ -8,13 +8,19 @@ use std::net::{TcpStream, TcpListener};
 const BUFFER_SIZE: usize = 1024;
 
 #[derive(Component)]
-struct StreamComponent(pub TcpStream);
+pub struct StreamComponent(pub TcpStream);
 
 #[derive(Component)]
-struct ListenerComponent(pub TcpListener);
+pub struct ListenerComponent(pub TcpListener);
 
 pub use client::ClientPlugin;
 
 pub use server::ServerPlugin;
 
-pub trait Packet: Send + Serialize + Sync + 'static { }
+pub trait SendingPacket: Send + Serialize + Sync + 'static {
+    fn serialize_packet(&self) -> Vec<u8>;
+}
+
+pub trait RecievingPacket: for<'de> Deserialize<'de> + Send + Sync + 'static {
+    fn deserialize_packet(buffer: &[u8]) -> Self;
+}

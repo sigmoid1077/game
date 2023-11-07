@@ -1,3 +1,5 @@
+use std::marker::PhantomData;
+
 use bevy::{
     app::{App, AppExit, Plugin, Startup, Update},
     ecs::event::{EventReader, EventWriter},
@@ -5,13 +7,31 @@ use bevy::{
     DefaultPlugins
 };
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
+use serde::{Deserialize, Serialize};
 use util::net;
+
+#[derive(Serialize, Deserialize)]
+enum Packet {
+    MyPacket(String),
+}
+
+impl net::SendingPacket for Packet {
+    fn serialize_packet(&self) -> Vec<u8> {
+        bincode::serialize(&self).unwrap()
+    }
+}
+
+impl net::RecievingPacket for Packet {
+    fn deserialize_packet(buffer: &[u8]) -> Self {
+        bincode::deserialize(buffer).unwrap()
+    }
+}
 
 fn main() {
     App::new()
         .add_plugins((
             DefaultPlugins,
-            net::server::ServerPlugin,
+            net::ServerPlugin::<Packet, Packet>(PhantomData, PhantomData),
             TestPlugin,
             WorldInspectorPlugin::new()
         ))
@@ -36,22 +56,22 @@ fn update(
     mut app_exit_events: EventReader<AppExit>,
     mut keyboard_input_events: EventReader<KeyboardInput>,
     mut unbind_event: EventWriter<net::server::event::write::UnbindEvent>,
-    mut recieved_packet_from_client_events: EventReader<net::server::event::read::RecievedPacketFromClientEvent>,
-    mut send_packet_to_all_clients_event: EventWriter<net::server::event::write::SendPacketToAllClients>
+    mut recieved_packet_from_client_events: EventReader<net::server::event::read::RecievedPacketFromClientEvent<Packet>>,
+    mut send_packet_to_all_clients_event: EventWriter<net::server::event::write::SendPacketToAllClients<Packet>>
 ) {
-    for _ in app_exit_events.iter() {
+    for _ in app_exit_events.read() {
         unbind_event.send(net::server::event::write::UnbindEvent);
     }
 
-    for recieved_packet_from_client_event in recieved_packet_from_client_events.iter() {
+    for recieved_packet_from_client_event in recieved_packet_from_client_events.read() {
         match &recieved_packet_from_client_event.0 {
-            net::Packet::MyPacket(string) => println!("{}", &string)
+            Packet::MyPacket(string) => println!("{}", &string)
         }
     }
 
-    for keyboard_input_event in keyboard_input_events.iter() {
+    for keyboard_input_event in keyboard_input_events.read() {
         if keyboard_input_event.state == ButtonState::Pressed {
-            send_packet_to_all_clients_event.send(net::server::event::write::SendPacketToAllClients(net::Packet::MyPacket(format!("{:?}", keyboard_input_event.key_code.unwrap()))));
+            send_packet_to_all_clients_event.send(net::server::event::write::SendPacketToAllClients(Packet::MyPacket(format!("{:?}", keyboard_input_event.key_code.unwrap()))));
         }
     }
 }
