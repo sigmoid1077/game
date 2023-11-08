@@ -31,7 +31,7 @@ fn main() {
         .add_plugins((
             DefaultPlugins,
             net::ClientPlugin::<Packet, Packet>(PhantomData, PhantomData),
-            TestPlugin,
+            // TestPlugin,
             WorldInspectorPlugin::new()
         ))
         .run();

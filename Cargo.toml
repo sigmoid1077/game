@@ -3,13 +3,16 @@ members = ["client", "net", "server", "util"]
 
 [workspace.dependencies]
 bevy = "0.12"
-bevy-inspector-egui = "0.21.0"
+bevy-inspector-egui = "0.21"
 bincode = "1.3.3"
 net = { path = "./net" }
 quote = "1.0.33"
-serde = { version = "1.0.190", features = ["derive"] }
-syn = "2.0.38"
+serde = { version = "1.0.192", features = ["derive"] }
+syn = "2.0.39"
 util = { path = "./util" }
+
+[workspace.target.wasm32-unknown-unknown]
+runner = "wasm-server-runner"
 
 [profile.dev]
 opt-level = 1
