@@ -105,7 +105,7 @@ pub fn write_client_disconnected_event_and_recieved_packet_from_client_event_sys
                     commands.entity(entity_with_tcp_stream_component).despawn();
                 },
                 Ok(packet_length) => recieved_packet_from_client_event.send(super::event::read::RecievedPacketFromClientEvent(Rp::deserialize_packet(&buffer[0..packet_length]))),
-                _ => unreachable!()
+                _ => ()
             }
         }
     }

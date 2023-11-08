@@ -77,7 +77,7 @@ pub fn write_server_disconnected_event_and_recieved_packet_event_system<Rp: Reci
                     commands.entity(entity_with_tcp_stream_component).despawn();
                 },
                 Ok(packet_length) => recieved_packet_events.send(super::event::read::RecievedPacket(Rp::deserialize_packet(buffer[0..packet_length].as_ref()))),
-                _ => unreachable!()
+                _ => ()
             }
         }
     }
