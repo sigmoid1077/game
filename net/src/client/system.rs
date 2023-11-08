@@ -27,6 +27,9 @@ pub fn read_connect_event_system(
     }
 }
 
+#[cfg(target_arch = "wasm32")]
+pub fn read_connect_event_system() {}
+
 #[cfg(not(target_arch = "wasm32"))]
 pub fn read_disconnect_event_system(
     mut commands: Commands,

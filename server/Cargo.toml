@@ -9,4 +9,3 @@ bevy-inspector-egui = { workspace = true }
 bincode = { workspace = true }
 serde = { workspace = true }
 util = { workspace = true }
-websocket = { workspace = true }
