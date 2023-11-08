@@ -1,9 +1,6 @@
 pub mod event;
 mod system;
 
-// add support for generic packet types
-// add support for custom serializers
-
 use bevy::app::{App, Plugin, Update};
 use crate::{SendingPacket, RecievingPacket};
 use std::marker::PhantomData;

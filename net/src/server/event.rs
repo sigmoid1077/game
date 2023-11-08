@@ -1,5 +1,3 @@
-// add support for generic packet types
-
 use bevy::ecs::event::Event;
 use crate::{RecievingPacket, SendingPacket};
 

@@ -1,7 +1,3 @@
-// #[cfg(not(target_arch = "wasm32"))] for this entire module
-// add support for generic packet types
-// add support for custom serializers
-
 pub mod event;
 mod system;
 
