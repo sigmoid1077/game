@@ -6,7 +6,7 @@ use bevy::ecs::{
     query::With,
     system::{Commands, Query}
 };
-use crate::{BUFFER_SIZE, RecievingPacket, SendingPacket, StreamComponent};
+use crate::util::{BUFFER_SIZE, RecievingPacket, SendingPacket, StreamComponent};
 use std::{
     io::{Read, Write},
     net::{TcpStream, Shutdown}
@@ -27,9 +27,6 @@ pub fn read_connect_event_system(
     }
 }
 
-#[cfg(target_arch = "wasm32")]
-pub fn read_connect_event_system() {}
-
 #[cfg(not(target_arch = "wasm32"))]
 pub fn read_disconnect_event_system(
     mut commands: Commands,
@@ -47,9 +44,6 @@ pub fn read_disconnect_event_system(
     }
 }
 
-#[cfg(target_arch = "wasm32")]
-pub fn read_disconnect_event_system() {}
-
 #[cfg(not(target_arch = "wasm32"))]
 pub fn write_send_packet_event_system<Sp: SendingPacket>(
     mut send_packet_events: EventReader<super::event::write::SendPacketEvent<Sp>>,
@@ -64,9 +58,6 @@ pub fn write_send_packet_event_system<Sp: SendingPacket>(
         }
     }
 }
-
-#[cfg(target_arch = "wasm32")]
-pub fn write_send_packet_event_system<Sp: SendingPacket>() {}
 
 #[cfg(not(target_arch = "wasm32"))]
 pub fn write_server_disconnected_event_and_recieved_packet_event_system<Rp: RecievingPacket>(
@@ -91,6 +82,3 @@ pub fn write_server_disconnected_event_and_recieved_packet_event_system<Rp: Reci
         }
     }
 }
-
-#[cfg(target_arch = "wasm32")]
-pub fn write_server_disconnected_event_and_recieved_packet_event_system<Rp: RecievingPacket>() {}

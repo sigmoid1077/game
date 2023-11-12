@@ -11,9 +11,6 @@ serde = { version = "1.0.192", features = ["derive"] }
 syn = "2.0.39"
 util = { path = "./util" }
 
-[workspace.target.wasm32-unknown-unknown]
-runner = "wasm-server-runner"
-
 [profile.dev]
 opt-level = 1
 

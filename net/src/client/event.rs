@@ -1,11 +1,10 @@
 use bevy::ecs::event::Event;
-use crate::SendingPacket;
+use crate::util::{RecievingPacket, SendingPacket};
 use std::net::SocketAddr;
 
 pub mod write {
     use super::*;
 
-    // add field for server ip
     #[derive(Event)]
     pub struct ConnectEvent(pub SocketAddr);
 
@@ -17,8 +16,6 @@ pub mod write {
 }
 
 pub mod read {
-    use crate::RecievingPacket;
-
     use super::*;
 
     #[derive(Event)]

@@ -6,7 +6,7 @@ use bevy::ecs::{
     query::With,
     system::{Commands, Query}
 };
-use crate::{BUFFER_SIZE, ListenerComponent, RecievingPacket, SendingPacket, StreamComponent};
+use crate::util::{BUFFER_SIZE, ListenerComponent, RecievingPacket, SendingPacket, StreamComponent};
 use std::{
     io::{Read, Write},
     net::{Ipv4Addr, Shutdown, SocketAddr, TcpListener}
