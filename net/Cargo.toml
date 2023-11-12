@@ -6,3 +6,10 @@ edition = "2021"
 [dependencies]
 bevy = { workspace = true }
 serde = { workspace = true }
+
+[dev-dependencies]
+bevy = { workspace = true }
+bevy-inspector-egui = { workspace = true }
+bincode = { workspace = true }
+serde = { workspace = true }
+util = {workspace = true }
