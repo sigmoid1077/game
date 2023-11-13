@@ -7,6 +7,12 @@ edition = "2021"
 bevy = { workspace = true }
 serde = { workspace = true }
 
+[[example]]
+name = "client"
+
+[[example]]
+name = "server"
+
 [dev-dependencies]
 bevy = { workspace = true }
 bevy-inspector-egui = { workspace = true }
