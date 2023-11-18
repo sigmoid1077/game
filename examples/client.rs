@@ -60,8 +60,8 @@ fn update(
         disconnect_event.send(event::write::DisconnectEvent);
     }
     
-    for recieved_packet_from_server_event in recieved_packet_events.read() {
-        match &recieved_packet_from_server_event.0 {
+    for recieved_packet_event in recieved_packet_events.read() {
+        match &recieved_packet_event.0 {
             Packet::MyPacket(string) => println!("{}", string.as_str())
         }
     }

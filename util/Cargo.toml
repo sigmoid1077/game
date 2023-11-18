@@ -5,4 +5,5 @@ edition = "2021"
 
 [dependencies]
 net = { workspace = true }
+ui = { workspace = true }
 world = { workspace = true }

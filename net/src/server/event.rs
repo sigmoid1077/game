@@ -1,5 +1,5 @@
 use bevy::ecs::event::Event;
-use crate::util::{RecievingPacket, SendingPacket};
+use crate::{RecievingPacket, SendingPacket};
 
 pub mod write {
     use super::*;

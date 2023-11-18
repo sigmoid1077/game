@@ -1,5 +1,5 @@
 [workspace]
-members = ["client", "net", "server", "util", "world"]
+members = ["client", "net", "server", "ui", "util", "world"]
 
 [workspace.dependencies]
 bevy = "0.12.0"
@@ -8,6 +8,7 @@ bincode = "1.3.3"
 net = { path = "./net" }
 quote = "1.0.33"
 serde = { version = "1.0.192", features = ["derive"] }
+ui = { path = "./ui" }
 util = { path = "./util" }
 world = { path = "./world" }
 
