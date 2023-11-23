@@ -1,25 +1,25 @@
 use bevy::{
     app::{App, AppExit, Plugin, Startup, Update},
-    ecs::event::{EventReader, EventWriter},
+    ecs::event::EventReader,
     input::{keyboard::KeyboardInput, ButtonState},
     DefaultPlugins
 };
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
 use serde::{Deserialize, Serialize};
 use std::marker::PhantomData;
-use util::{net, net::server::event};
-    
+use util::net;
+
 #[derive(Serialize, Deserialize)]
 enum Packet {
     MyPacket(String),
 }
-    
+
 impl net::SendingPacket for Packet {
     fn serialize_packet(&self) -> Vec<u8> {
         bincode::serialize(&self).unwrap()
     }
 }
-    
+
 impl net::RecievingPacket for Packet {
     fn deserialize_packet(buffer: &[u8]) -> Self {
         bincode::deserialize(buffer).unwrap()
@@ -36,9 +36,9 @@ fn main() {
         ))
         .run();
 }
-    
+
 struct TestPlugin;
-    
+
 impl Plugin for TestPlugin {
     fn build(&self, app: &mut App) {
         app
@@ -46,23 +46,28 @@ impl Plugin for TestPlugin {
             .add_systems(Update, update);
     }
 }
-    
-fn startup(mut bind_event: EventWriter<event::write::BindEvent>) {
-    bind_event.send(event::write::BindEvent(std::env::args().collect::<Vec<_>>().last().unwrap().parse().unwrap()));
+
+fn startup(mut server: net::ServerSystemParam<Packet, Packet>) {
+    let port = std::env::args()
+        .collect::<Vec<_>>()
+        .last()
+        .unwrap()
+        .parse()
+        .unwrap();
+
+    server.bind(port);
 }
-    
+
 fn update(
     mut app_exit_events: EventReader<AppExit>,
     mut keyboard_input_events: EventReader<KeyboardInput>,
-    mut unbind_event: EventWriter<event::write::UnbindEvent>,
-    mut recieved_packet_from_client_events: EventReader<event::read::RecievedPacketFromClientEvent<Packet>>,
-    mut send_packet_to_all_clients_event: EventWriter<event::write::SendPacketToAllClients<Packet>>
+    mut server: net::ServerSystemParam<Packet, Packet>
 ) {
     for _app_exit_event in app_exit_events.read() {
-        unbind_event.send(event::write::UnbindEvent);
+        server.unbind();
     }
     
-    for recieved_packet_from_client_event in recieved_packet_from_client_events.read() {
+    for recieved_packet_from_client_event in server.recieved_packets() {
         match &recieved_packet_from_client_event.0 {
             Packet::MyPacket(string) => println!("{}", string.as_str())
         }
@@ -70,7 +75,8 @@ fn update(
     
     for keyboard_input_event in keyboard_input_events.read() {
         if keyboard_input_event.state == ButtonState::Pressed {
-            send_packet_to_all_clients_event.send(event::write::SendPacketToAllClients(Packet::MyPacket(String::from("Packet from server"))));
+            let packet = Packet::MyPacket(String::from("Packet from server"));
+            server.send_packet_to_all_clients(packet);
         }
     }
 }

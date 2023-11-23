@@ -1,26 +1,26 @@
 use bevy::ecs::event::Event;
-use crate::{RecievingPacket, SendingPacket};
+use crate::Packet;
 use std::net::SocketAddr;
 
 pub(crate) mod write {
     use super::*;
 
     #[derive(Event)]
-    pub struct ConnectEvent(pub SocketAddr);
+    pub(crate) struct ConnectEvent(pub SocketAddr);
 
     #[derive(Event)]
-    pub struct DisconnectEvent;
+    pub(crate) struct DisconnectEvent;
 
     #[derive(Event)]
-    pub struct SendPacketEvent<Sp: SendingPacket>(pub Sp);
+    pub(crate) struct SendPacketEvent<Sp: Packet>(pub Sp);
 }
 
 pub(crate) mod read {
     use super::*;
 
     #[derive(Event)]
-    pub struct ServerDisconnectedEvent;
+    pub(crate) struct ServerDisconnectedEvent;
 
     #[derive(Event)]
-    pub struct RecievedPacket<Rp: RecievingPacket>(pub Rp);
+    pub(crate) struct RecievedPacket<Rp: Packet>(pub Rp);
 }

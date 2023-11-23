@@ -1,5 +1,5 @@
 use bevy::ecs::event::Event;
-use crate::{RecievingPacket, SendingPacket};
+use crate::Packet;
 
 pub mod write {
     use super::*;
@@ -11,10 +11,10 @@ pub mod write {
     pub struct UnbindEvent;
 
     #[derive(Event)]
-    pub struct SendPacketToClient<Sp: SendingPacket>(/* client */ pub Sp);
+    pub struct SendPacketToClient<Sp: Packet>(/* client */ pub Sp);
 
     #[derive(Event)]
-    pub struct SendPacketToAllClients<Sp: SendingPacket>(pub Sp);
+    pub struct SendPacketToAllClients<Sp: Packet>(pub Sp);
 }
 
 pub mod read {
@@ -27,5 +27,5 @@ pub mod read {
     pub struct ClientDisconnectedEvent(/* client */);
 
     #[derive(Event)]
-    pub struct RecievedPacketFromClientEvent<Rp: RecievingPacket>(/* client */ pub Rp);
+    pub struct RecievedPacketFromClientEvent<Rp: Packet>(/* client */ pub Rp);
 }

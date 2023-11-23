@@ -1,10 +1,10 @@
 use bevy::app::{App, Plugin, Update};
-use crate::{server::{event, system}, RecievingPacket, SendingPacket};
+use crate::{Packet, server::{event, system}};
 use std::marker::PhantomData;
 
-pub struct ServerPlugin<Sp: SendingPacket, Rp: RecievingPacket>(pub PhantomData<Sp>, pub PhantomData<Rp>);
+pub struct ServerPlugin<Sp: Packet, Rp: Packet>(pub PhantomData<Sp>, pub PhantomData<Rp>);
 
-impl<Sp: SendingPacket, Rp: RecievingPacket> Plugin for ServerPlugin<Sp, Rp> {
+impl<Sp: Packet, Rp: Packet> Plugin for ServerPlugin<Sp, Rp> {
     fn build(&self, app: &mut App) {
         app
             .add_event::<event::write::BindEvent>()

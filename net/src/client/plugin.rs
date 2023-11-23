@@ -1,11 +1,10 @@
 use bevy::app::{App, Plugin, Update};
-use crate::{SendingPacket, RecievingPacket};
+use crate::{client::{event, system}, Packet};
 use std::marker::PhantomData;
-use super::{event, system};
 
-pub struct ClientPlugin<Sp: SendingPacket, Rp: RecievingPacket>(pub PhantomData<Sp>, pub PhantomData<Rp>);
+pub struct ClientPlugin<Sp: Packet, Rp: Packet>(pub PhantomData<Sp>, pub PhantomData<Rp>);
 
-impl<Sp: SendingPacket, Rp: RecievingPacket> Plugin for ClientPlugin<Sp, Rp> {
+impl<Sp: Packet, Rp: Packet> Plugin for ClientPlugin<Sp, Rp> {
     fn build(&self, app: &mut App) {
         app
             .add_event::<event::write::ConnectEvent>()

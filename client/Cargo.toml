@@ -7,5 +7,5 @@ edition = "2021"
 bevy = { workspace = true }
 bevy-inspector-egui = { workspace = true }
 bincode = { workspace = true }
+net ={ workspace = true }
 serde = { workspace = true }
-util = {workspace = true }
