@@ -6,7 +6,7 @@ use bevy::ecs::{
     query::With,
     system::{Commands, Query}
 };
-use crate::{BUFFER_SIZE, ServerComponent, Packet, server::event, ClientComponent};
+use crate::{ServerComponent, Packet, server::event, ClientComponent};
 use std::{
     io::{Read, Write}, 
     net::{Ipv4Addr, Shutdown, SocketAddr, TcpListener}
@@ -87,7 +87,7 @@ pub(crate) fn write_client_connected_event_system(
     }
 }
 
-pub(crate) fn write_client_disconnected_event_and_recieved_packet_from_client_event_system<Rp: Packet>(
+pub(crate) fn write_client_disconnected_event_and_recieved_packet_from_client_event_system<const BUFFER_SIZE: usize, Rp: Packet>(
     mut client_disconnected_event: EventWriter<event::read::ClientDisconnectedEvent>,
     mut commands: Commands,
     entity_with_client_component_query: Query<Entity, With<ClientComponent>>,

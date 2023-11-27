@@ -1,7 +1,8 @@
 [package]
-name = "world"
+name = "voxel_world"
 version = "0.1.0"
 edition = "2021"
 
 [dependencies]
 bevy = { workspace = true }
+ndshape = { workspace = true }

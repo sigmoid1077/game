@@ -1,18 +1,18 @@
 [workspace]
-members = ["client", "item", "net", "server", "ui", "world"]
+members = ["./bin/client", "./lib/net", "./bin/server", "./lib/voxel_world"]
 
 [workspace.dependencies]
 # external dependencies
 bevy = "0.12.0"
 bevy-inspector-egui = "0.21.0"
 bincode = "1.3.3"
+ndshape = "0.3.0"
+noise = { version = "0.8.2", features = ["images"]}
 quote = "1.0.33"
 serde = { version = "1.0.193", features = ["derive"] }
 # internal dependencies
-item = { path = "./item" }
-net = { path = "./net" }
-ui = { path = "./ui" }
-world = { path = "./world" }
+net = { path = "./lib/net" }
+voxel_world = { path = "./lib/voxel_world" }
 
 [workspace.package]
 version = "0.1.0"

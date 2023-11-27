@@ -1,0 +1,11 @@
+[package]
+name = "client"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+# external dependencies
+bevy = { workspace = true }
+bevy-inspector-egui = { workspace = true }
+# internal dependencies
+voxel_world = { workspace = true }

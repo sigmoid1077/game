@@ -5,8 +5,6 @@ use std::net::{TcpStream, TcpListener};
 pub mod client;
 pub mod server;
 
-pub(crate) const BUFFER_SIZE: usize = 1024;
-
 #[derive(Component)]
 pub(crate) struct ClientComponent(pub TcpStream);
 

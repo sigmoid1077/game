@@ -4,9 +4,9 @@ use bevy::ecs::{
     entity::Entity,
     event::{EventReader, EventWriter},
     query::With,
-    system::{Commands, Query, Res, ResMut}
+    system::{Commands, Query}
 };
-use crate::{BUFFER_SIZE, client::{event}, Packet, ClientComponent};
+use crate::{client::event, Packet, ClientComponent};
 use std::{io::{Read, Write}, net::{TcpStream, Shutdown}};
 
 pub(crate) fn read_connect_event_system(
@@ -53,7 +53,7 @@ pub(crate) fn write_send_packet_event_system<Sp: Packet>(
     }
 }
 
-pub(crate) fn write_server_disconnected_event_and_recieved_packet_event_system<Rp: Packet>(
+pub(crate) fn write_server_disconnected_event_and_recieved_packet_event_system<const BUFFER_SIZE: usize, Rp: Packet>(
     mut commands: Commands,
     entity_with_client_component_query: Query<Entity, With<ClientComponent>>,
     mut mut_client_component_query: Query<&mut ClientComponent>,
